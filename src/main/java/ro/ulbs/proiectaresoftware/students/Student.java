@@ -3,17 +3,17 @@ package ro.ulbs.proiectaresoftware.students;
 import java.util.List;
 import java.util.Objects;
 
-public class Student {
+public class Student implements Comparable<Student>{
     String numarMatricol;
     String nume;
     String prenume;
-    String formațieDeStudiu;
+    String formatieDeStudiu;
 
-    public Student(String numarMatricol, String prenume, String nume, String formațieDeStudiu) {
+    public Student(String numarMatricol, String prenume, String nume, String formatieDeStudiu) {
         this.numarMatricol = numarMatricol;
         this.nume = nume;
         this.prenume = prenume;
-        this.formațieDeStudiu = formațieDeStudiu;
+        this.formatieDeStudiu = formatieDeStudiu;
     }
 
     public String getNumarMatricol() {
@@ -28,25 +28,29 @@ public class Student {
         return prenume;
     }
 
-    public String getFormațieDeStudiu() {
-        return formațieDeStudiu;
+    public String getFormatieDeStudiu() {
+        return formatieDeStudiu;
     }
 
 
     @Override
     public String toString() {
-        return String.format("%s %10s %10s %10s", numarMatricol, prenume, nume, formațieDeStudiu);
+        return String.format("%s %10s %10s %10s", numarMatricol, prenume, nume, formatieDeStudiu);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return Objects.equals(nume, student.nume) && Objects.equals(prenume, student.prenume) && Objects.equals(formațieDeStudiu, student.formațieDeStudiu);
+        return Objects.equals(nume, student.nume) && Objects.equals(prenume, student.prenume) && Objects.equals(formatieDeStudiu, student.formatieDeStudiu);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nume, prenume, formațieDeStudiu);
+        return Objects.hash(nume, prenume, formatieDeStudiu);
+    }
+    @Override
+    public int compareTo(Student student) {
+        return this.nume.compareTo(student.nume);
     }
 }
