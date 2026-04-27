@@ -37,8 +37,7 @@ public class Application {
        sortareDupaGrupaNumeSiPrenume(studenti);
        afisareLista(studenti);
 
-       Map<String,Integer> note;
-       citireNote();
+       Map<String,Integer> note=citireNote();
        System.out.println("Nota studentului cautat este: "+getNota(studenti.get(2), citireNote()));
 
 
@@ -82,6 +81,7 @@ public class Application {
             System.out.println(s);
         }
     }
+
     public static void sortareDupaNume(List<Student> studenti) {
         Collections.sort(studenti, new Comparator<Student>() {
             @Override
@@ -121,7 +121,6 @@ public class Application {
         return studenti2;
     }
 
-
     public static Map<String,Integer> citireNote() throws IOException{
         Map<String,Integer> note2 = new HashMap<>();
         List<String>lines=Files.readAllLines(Paths.get("note.csv"));
@@ -131,6 +130,7 @@ public class Application {
                 note2.put(parts[0], Integer.parseInt(parts[1]));
             }
         }
+
         return note2;
     }
 
@@ -145,7 +145,7 @@ public class Application {
         }
     }
 
-    private static Map<Student,Integer> mapareNote(Map<String,Integer>note, List<Student>lista){
+    public static Map<Student,Integer> mapareNote(Map<String,Integer>note, List<Student>lista){
         Map<Student,Integer>noteMapate=new HashMap<Student,Integer>();
         for(Student student:lista) {
             if(note.containsKey(student.getNumarMatricol())) {
