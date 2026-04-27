@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Application {
     public static void main(String[] args) throws IOException {
-//        Student s1 = new Student("112", "Ioan", "Popa", "C22/1");
+ //       Student s1 = new Student(null, "KEN", "MARCU", "C22/1");
 //        Student s2 = new Student("112", "Maria", "Oprea", "TI21/1");
 //        Student s3 = new Student("120", "Alis", "Popa", "TI21/2");
 //        Student s4 = new Student("122", "Mihai", "Vecerdea", "TI22/1");
@@ -26,7 +26,8 @@ public class Application {
 //        System.out.println("Lista contine "+studenti.size()+" studenti.");
 
         afisareLista(studenti);
-        System.out.println(prezent(new Student("1752", "MIHAI", "IONESCU", "C22/2"), set));
+        System.out.println(prezent(new Student("1752", "MIHAI", "IONESCU",
+                "C22/2"), set));
 
         System.out.println("Dupa sortare dupa nume:");
        sortareDupaNume(studenti);
@@ -36,11 +37,16 @@ public class Application {
        sortareDupaGrupaNumeSiPrenume(studenti);
        afisareLista(studenti);
 
+       Map<String,Integer> note;
+       citireNote();
+       System.out.println("Nota studentului cautat este: "+getNota(studenti.get(2), citireNote()));
+
+
 
     }
 
     private static List<Student> creareLista() throws IOException {
-        Student s1 = new Student("112", "Ioan", "Popa", "C22/1");
+        Student s1 = new Student("111", "Ion Ionel", "Ionut", "C22/1");
         Student s2 = new Student("112", "Maria", "Oprea", "TI21/1");
         Student s3 = new Student("120", "Alis", "Popa", "TI21/2");
         Student s4 = new Student("122", "Mihai", "Vecerdea", "TI22/1");
@@ -114,4 +120,40 @@ public class Application {
         }
         return studenti2;
     }
+
+
+    public static Map<String,Integer> citireNote() throws IOException{
+        Map<String,Integer> note2 = new HashMap<>();
+        List<String>lines=Files.readAllLines(Paths.get("note.csv"));
+        for(String line:lines) {
+            String[] parts = line.split(",");
+            if(parts.length==2) {
+                note2.put(parts[0], Integer.parseInt(parts[1]));
+            }
+        }
+        return note2;
+    }
+
+    public static int getNota(Student student, Map<String,Integer>note) throws IOException {
+        note = citireNote();
+
+        if (note.containsKey(student.getNumarMatricol())) {
+            return note.get(student.getNumarMatricol());
+        }
+        else {
+            throw new IllegalArgumentException("Studentul nu are nota sau nu este in lista");
+        }
+    }
+
+    private static Map<Student,Integer> mapareNote(Map<String,Integer>note, List<Student>lista){
+        Map<Student,Integer>noteMapate=new HashMap<Student,Integer>();
+        for(Student student:lista) {
+            if(note.containsKey(student.getNumarMatricol())) {
+                noteMapate.put(student, note.get(student.getNumarMatricol()));
+            }
+        }
+        return noteMapate;
+
+    }
+
 }
