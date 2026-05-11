@@ -1,29 +1,28 @@
 package ro.ulbs.proiectaresoftware.students;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class Application {
     public static void main(String[] args) throws IOException {
- //       Student s1 = new Student(null, "KEN", "MARCU", "C22/1");
-//        Student s2 = new Student("112", "Maria", "Oprea", "TI21/1");
-//        Student s3 = new Student("120", "Alis", "Popa", "TI21/2");
-//        Student s4 = new Student("122", "Mihai", "Vecerdea", "TI22/1");
-//        Student s5 = new Student("122", "Eugen", "Uritescu", "TI22/2");
 
-//        System.out.println(s1);
-//        System.out.println(s2);
-//        System.out.println(s3);
-//        System.out.println(s4);
-//        System.out.println(s5);
 
         List<Student> studenti = creareLista();
+        export(studenti,getExporter("studenti_.xlsx"));
+        export(studenti,getExporter("studenti_.csv"));
 
         Set<Student> set = new HashSet<>(studenti);
-
-//        System.out.println("Lista contine "+studenti.size()+" studenti.");
 
         afisareLista(studenti);
         System.out.println(prezent(new Student("1752", "MIHAI", "IONESCU",
@@ -39,8 +38,6 @@ public class Application {
 
        Map<String,Integer> note=citireNote();
        System.out.println("Nota studentului cautat este: "+getNota(studenti.get(2), citireNote()));
-
-
 
     }
 
@@ -156,4 +153,113 @@ public class Application {
 
     }
 
+    public static void exportToExcel(List<Student> lista, Path outFile) throws IOException {
+        try(XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Studenti");
+
+            int rowNum = 0;
+            Row header = sheet.createRow(rowNum++);
+            header.createCell(0).setCellValue("Numar matricol");
+            header.createCell(1).setCellValue("Prenume");
+            header.createCell(2).setCellValue("Nume");
+            header.createCell(3).setCellValue("Formatie de studiu");
+
+            for(Student student:lista) {
+            Row row = sheet.createRow(rowNum++);
+            Cell c0 =row.createCell(0);
+            c0.setCellValue(nullToEmpty(student.getNumarMatricol()));
+                row.createCell(1).setCellValue(nullToEmpty(student.getPrenume()));
+                row.createCell(2).setCellValue(nullToEmpty(student.getNume()));
+                row.createCell(3).setCellValue(nullToEmpty(student.getFormatieDeStudiu()));
+            }
+
+            try (OutputStream os = Files.newOutputStream(outFile)) {
+                workbook.write(os);
+            }
+
+        }
+    }
+
+    public static void exportToCsv(List<Student> studenti, Path outFile) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(outFile, StandardCharsets.UTF_8)) {
+            // antet
+            writer.write("numarMatricol,prenume,nume,formatieDeStudiu");
+            writer.newLine();
+            for (Student s : studenti) {
+                writer.write(csvEscape(s.getNumarMatricol()));
+                writer.write(',');
+                writer.write(csvEscape(s.getPrenume()));
+                writer.write(',');
+                writer.write(csvEscape(s.getNume()));
+                writer.write(',');
+                writer.write(csvEscape(s.getFormatieDeStudiu()));
+                writer.newLine();
+            }
+        }
+    }
+
+    private static String csvEscape(String field) {
+        if (field == null) return "";
+        boolean needQuotes = field.contains(",") || field.contains("\"") || field.contains("\n") || field.contains("\r");
+        String escaped = field.replace("\"", "\"\""); // dublăm ghilimelele
+        if (needQuotes) {
+            return "\"" + escaped + "\"";
+        } else {
+            return escaped;
+        }
+    }
+
+    private static String nullToEmpty(String s) {
+        return s == null ? "" : s;
+    }
+
+    public static Exporter getExporter(String filename){
+    String fileExtension= filename.substring(filename.lastIndexOf(".")+1);
+
+    switch (fileExtension){
+        case "csv":
+            return new ExportToCSV(filename);
+        case "xlsx":
+            return new ExportToExcel(filename);
+        default:
+            throw new IllegalArgumentException("Unkown file extension: "+fileExtension);
+    }
+    }
+
+    public static void export(List<Student> list,Exporter exporter) throws IOException {
+        exporter.export(list);
+    }
+
+
+//    public static void/*a se schimba din void in Importer*/getImporter(String... args){
+//       String fileExtension= args[0].substring(args[0].lastIndexOf(".")+1);
+//        switch (args[0]){
+//            case "csv":
+//                //return new ImportFromCSV(args[1]);
+//            case "xlsx":
+//                //return new ImportFromExcel(args[1]);
+//        }
+//    };
+
+
+    public static void commentsMain() {
+        //linia 19       Student s1 = new Student(null, "KEN", "MARCU", "C22/1");
+//        Student s2 = new Student("112", "Maria", "Oprea", "TI21/1");
+//        Student s3 = new Student("120", "Alis", "Popa", "TI21/2");
+//        Student s4 = new Student("122", "Mihai", "Vecerdea", "TI22/1");
+//        Student s5 = new Student("122", "Eugen", "Uritescu", "TI22/2");
+
+//        System.out.println(s1);
+//        System.out.println(s2);
+//        System.out.println(s3);
+//        System.out.println(s4);
+// 29       System.out.println(s5);
+
+        //25        try {
+//            exportToCsv(studenti, Paths.get("studenti_export.csv"));
+//            exportToExcel(studenti, Paths.get("studenti_export.xlsx"));
+//        } catch (IOException e) {
+//            e.printStackTrace(); // sau logging, sau aruncă mai departe
+//  30        }
+    }
 }
